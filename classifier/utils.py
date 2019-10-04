@@ -30,7 +30,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
 def json_fp(src_doc: File) -> str:
     """make a json filepath from a Source.document's path"""
     bn = os.path.basename(src_doc.name)
-    return ".".join([bn.split(".")[0], "json"])
+    return os.path.join("analysis", ".".join([bn.split(".")[0], "json"]))
 
 
 def write_data(data: dict, filepath: str) -> None:

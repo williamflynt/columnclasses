@@ -12,3 +12,5 @@ Classify columns in CSVs
 1. Clone repo
 2. `python manage.py migrate`
 3. `python manage.py runserver`
+4. Upload some CSVs
+5. Classify the columns

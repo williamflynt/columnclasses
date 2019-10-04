@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main-title %}Classify{% endblock main-title %}
+
+{% block extrasidebar %}
+    <button class="btn btn-primary" onClick="sendFormData({{ headers|length }})">Classify CSV</button>
+{% endblock extrasidebar %}
+
+{% block content %}
+    <h2>{{ source.document.name }}</h2>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm" style="font-size: 0.8em;">
+            <thead>
+            <tr>
+                {% for th in headers %}
+                    <th scope="col">{{ th }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for tr in rows %}
+                <tr>
+                    {% for td in tr %}
+                        <td>{{ td }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            <tr>
+                {% for td in headers %}
+
+                    <td>
+                        <div class="btn-group-vertical btn-group-toggle" data-toggle="buttons">
+                            {% for option in mains %}
+                                <label class="btn btn-sm btn-primary"
+                                       id="main-{{ forloop.parentloop.counter0 }}"
+                                       data-value="{{ option.0 }}"
+                                       onclick="loadOptions({{ option.0 }}, 'sub-div-{{ forloop.parentloop.counter0 }}', {{ forloop.parentloop.counter0 }})">
+                                    <input type="radio"/>
+                                    {{ option.1 }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                        <hr/>
+                        <div class="btn-group-vertical btn-group-toggle"
+                             id="sub-div-{{ forloop.counter0 }}"
+                             data-toggle="buttons"></div>
+                    </td>
+
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
+
+{% block extrajs %}
+    <script>let sourceId = {{ source.id }};</script>
+    <script type="text/javascript" src="{% static 'js/classify.js' %}"></script>
+{% endblock extrajs %}

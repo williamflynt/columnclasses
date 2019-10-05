@@ -16,6 +16,15 @@ def load_csv(document: File) -> pd.DataFrame:
 def analyze_column(index: int, df: pd.DataFrame) -> dict:
     """get metrics about a column in a DataFrame, as identified by index"""
     # TODO
+    # average line length
+    # average token count
+    # average token length
+    # percent chars digit
+    # percent chars alpha
+    # percent chars whitespace
+    # percent chars other
+    # unique char count
+    # unique token count
     return {}
 
 

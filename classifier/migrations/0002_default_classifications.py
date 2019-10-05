@@ -35,14 +35,12 @@ def add_defaults(apps, schema_editor):
     middle = Classification.objects.create(label="middle", description="A middle name or initial")
     last = Classification.objects.create(label="last", description="A surname")
     multiname = Classification.objects.create(label="multiname", description="More than one person's name in one cell")
-    companyname = Classification.objects.create(label="companyname", description="A company name component or full name in one cell")
     name = Classification.objects.create(label="name", description="Relates to the owning entity name", main=True)
     name.subclasses.add(fullname)
     name.subclasses.add(first)
     name.subclasses.add(middle)
     name.subclasses.add(last)
     name.subclasses.add(multiname)
-    name.subclasses.add(companyname)
 
     phone = Classification.objects.create(label="phone", description="A phone number", main=True)
 
@@ -56,7 +54,7 @@ def add_defaults(apps, schema_editor):
 
     apn = Classification.objects.create(label="apn", description="A parcel number", main=True)
 
-    dontcare = Classification.objects.create(label="dontcare", description="A value we don't care about", main=True)
+    dontcare = Classification.objects.create(label="", description="A value we don't care about", main=True)
 
 
 class Migration(migrations.Migration):

@@ -20,7 +20,7 @@ class Classification(TimeStampedModel):
     """A type that a Column can be"""
 
     # what we are labeling the column - a target for a classifier
-    label = models.CharField(max_length=255)
+    label = models.CharField(max_length=255, blank=True, unique=True)
 
     # human words on what this is
     description = models.TextField(blank=True)
@@ -39,7 +39,7 @@ class Classification(TimeStampedModel):
 
 
 class Column(TimeStampedModel):
-    """a column in a CSV"""
+    """a column in a Source CSV"""
 
     # The CSV-storing model
     source = models.ForeignKey("Source", on_delete=models.CASCADE)
@@ -64,6 +64,9 @@ class Column(TimeStampedModel):
     # Descriptive stats as a JSON object (sqlite doesn't have JSONField)
     # analysis = JSONField(blank=True)
     analysis = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = ("source", "index")
 
     def __str__(self) -> str:
         return f"{self.source.document.name[:10]} - Column {self.index}"

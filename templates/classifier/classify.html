@@ -37,7 +37,7 @@
                                        data-value="{{ option.0 }}"
                                        onclick="loadOptions({{ option.0 }}, 'sub-div-{{ forloop.parentloop.counter0 }}', {{ forloop.parentloop.counter0 }})">
                                     <input type="radio"/>
-                                    {{ option.1 }}
+                                    {{ option.1|default:"dontcare" }}
                                 </label>
                             {% endfor %}
                         </div>

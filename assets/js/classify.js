@@ -1,3 +1,8 @@
+// scroll bar on top as well for visibility
+$(document).ready(function(){
+  $('.table-responsive').doubleScroll();
+});
+
 async function postData(url = '', data = {}) {
     let body = JSON.stringify(data);
     // Default options are marked with *
@@ -34,7 +39,7 @@ function setOptions(optionObject, subDivId, parentLoopCounter) {
     for (let key in optionObject) {
         let lbl = document.createElement("label");
         let btnId = `sub-${parentLoopCounter}`;
-        lbl.setAttribute("class", "btn btn-sm btn-secondary");
+        lbl.setAttribute("class", "btn btn-xs btn-outline-secondary");
         lbl.setAttribute("id", btnId);
         lbl.setAttribute("data-value", key);
         lbl.innerHTML = optionObject[key];

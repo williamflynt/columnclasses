@@ -1,5 +1,5 @@
-import json
 import os
+from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -22,14 +22,27 @@ def load_csv(document: File) -> pd.DataFrame:
     return df
 
 
-def analyze_dataframe(df: pd.DataFrame) -> dict:
-    """analyze all columns in a DataFrame"""
+def load_labels(source: Source) -> Dict[str, List[str]]:
+    """make the list of labels, where Column index maps to the position in each list"""
+    labels = [c.labels for c in source.column_set.all()]
+    main, sub = zip(*labels)
+    labels = {"main": main, "sub": sub, "label": ["".join(item) for item in labels]}
+    return labels
+
+
+def analyze_dataframe(df: pd.DataFrame, labels: Dict[str, List[str]]) -> pd.DataFrame:
+    """analyze all columns in a DataFrame and return a DataFrame of results"""
 
     _df = pd.DataFrame()
 
+    # write labels for magical mAcHiNe LeArNiNg
+    _df['main'] = labels["main"]
+    _df['sub'] = labels["sub"]
+    _df['label'] = labels["label"]
+
     # mean token metrics aggregated across each column
     _df['mean_token_count'] = df.apply(lambda rows: np.mean([len(str(s).split()) for s in rows]))
-    _df['mean_token_length'] = df.apply(lambda rows: np.mean( [len(i.split()) for s in rows for i in str(s) ]   ))
+    _df['mean_token_length'] = df.apply(lambda rows: np.mean([len(i.split()) for s in rows for i in str(s)]))
 
     # fraction metrics aggregated across each column
     _df['frac_digit'] = df.apply(lambda rows: frac_fxn(count_digits, rows))
@@ -49,16 +62,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
     # number of rows tagged on each column
     _df['row_count'] = df.apply(lambda rows: len(rows))
 
-    # use pandas to_json to convert the df directly into a json format
-    # that can then be read directly back into a dataframe format later.
-    # a .transpose() method is used before converting in order to give the
-    # following format:
-    """
-    {"columnname1":{"mean_token_count":1.035,"mean_token_length":2.100, ...}, "columnname2": {...}, ... }
-    """
-    json_dataframe = _df.transpose().to_json()
-
-    return json_dataframe
+    return _df.transpose()
 
 
 def json_fp(src_doc: File) -> str:
@@ -67,10 +71,9 @@ def json_fp(src_doc: File) -> str:
     return os.path.join("analysis", ".".join([bn.split(".")[0], "json"]))
 
 
-def write_data(data: dict, filepath: str) -> None:
+def write_data(data: pd.DataFrame, filepath: str) -> None:
     """write some data to a file as json"""
-    with open(filepath, "w") as f:
-        json.dump(data, f)
+    data.to_json(filepath)
 
 
 def batch_analysis() -> None:
@@ -80,5 +83,6 @@ def batch_analysis() -> None:
     )
     for source in sources:
         df = load_csv(source.document)
-        data = analyze_dataframe(df)
+        labels = load_labels(source)
+        data = analyze_dataframe(df, labels)
         write_data(data, json_fp(source.document))

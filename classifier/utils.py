@@ -1,7 +1,8 @@
 import json
 import os
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 from django.core.files import File
 
 from classifier.models import Source
@@ -23,17 +24,23 @@ def analyze_column(index: int, df: pd.DataFrame) -> dict:
 """
     Small functions to clean up readability of the dataframe processing
 """
+
+
 def count_digits(s):   # counts 0 thru 9 in strings
     return sum(c.isdigit() for c in s)
+
 
 def count_letters(s): # counts A a thru Z z in strings
     return sum(c.isalpha() for c in s)
 
+
 def count_spaces(s):  # counts spaces
     return sum(c.isspace() for c in s)
 
+
 def count_other_text(s):  # counts non alphanum, non whitespace
     return len(s) - count_digits(s) - count_letters(s) - count_spaces(s)
+
 
 def frac_fxn(fxn, rows):  # calculates the numerator and denominator for functions requiring fractions
     s=0 # prevents a error
@@ -42,7 +49,9 @@ def frac_fxn(fxn, rows):  # calculates the numerator and denominator for functio
 
 def analyze_dataframe(df: pd.DataFrame) -> dict:
     """analyze all columns in a DataFrame"""
-    
+
+    _df = pd.DataFrame()
+
     # mean token metrics aggregated across each column
     _df['mean_token_count'] = df.apply(lambda rows: np.mean([len(str(s).split()) for s in rows]))
     _df['mean_token_length'] = df.apply(lambda rows: np.mean( [len(i.split()) for s in rows for i in str(s) ]   ))
@@ -52,7 +61,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
     _df['frac_alpha'] = df.apply(lambda rows: frac_fxn(count_letters,rows))
     _df['frac_space'] = df.apply(lambda rows: frac_fxn(count_spaces,rows))
     _df['frac_other_text'] = df.apply(lambda rows: frac_fxn(count_other_text,rows))
-    
+
     # line length metrics
     _df['mean_line_length'] = df.apply(lambda rows: np.mean([len(str(s)) for s in rows]))
     _df['median_line_length'] = df.apply(lambda rows: np.median([len(str(s)) for s in rows]))
@@ -64,7 +73,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
 
     # number of rows tagged on each column
     _df['row_count'] = df.apply(lambda rows: len(rows))
-    
+
     # use pandas to_json to convert the df directly into a json format
     # that can then be read directly back into a dataframe format later.
     # a .transpose() method is used before converting in order to give the
@@ -73,7 +82,7 @@ def analyze_dataframe(df: pd.DataFrame) -> dict:
     {"columnname1":{"mean_token_count":1.035,"mean_token_length":2.100, ...}, "columnname2": {...}, ... }
     """
     json_dataframe = _df.transpose().to_json()
-    
+
     return json_dataframe
 
 

@@ -7,6 +7,11 @@ from django.core.files import File
 
 from classifier.models import Source
 from classifier.pd_operations import (
+    mean_token_count,
+    mean_token_length,
+    avg_len,
+    unq_char_count,
+    unq_token_count,
     count_digits,
     count_letters,
     count_spaces,
@@ -41,31 +46,31 @@ def analyze_dataframe(df: pd.DataFrame, labels: Dict[str, List[str]]) -> pd.Data
     _df = pd.DataFrame()
 
     # write labels for magical mAcHiNe LeArNiNg
-    _df['main'] = labels["main"]
-    _df['sub'] = labels["sub"]
-    _df['label'] = labels["label"]
+    _df["main"] = labels["main"]
+    _df["sub"] = labels["sub"]
+    _df["label"] = labels["label"]
 
     # mean token metrics aggregated across each column
-    _df['mean_token_count'] = df.apply(lambda rows: np.mean([len(str(s).split()) for s in rows])).values
-    _df['mean_token_length'] = df.apply(lambda rows: np.mean([len(i.split()) for s in rows for i in str(s)])).values
+    _df["mean_token_count"] = df.apply(mean_token_count).values
+    _df["mean_token_length"] = df.apply(mean_token_length).values
 
     # fraction metrics aggregated across each column
-    _df['frac_digit'] = df.apply(lambda rows: frac_fxn(count_digits, rows)).values
-    _df['frac_alpha'] = df.apply(lambda rows: frac_fxn(count_letters, rows)).values
-    _df['frac_space'] = df.apply(lambda rows: frac_fxn(count_spaces, rows)).values
-    _df['frac_other_text'] = df.apply(lambda rows: frac_fxn(count_other_text, rows)).values
+    _df["frac_digit"] = df.apply(lambda rows: frac_fxn(count_digits, rows)).values
+    _df["frac_alpha"] = df.apply(lambda rows: frac_fxn(count_letters, rows)).values
+    _df["frac_space"] = df.apply(lambda rows: frac_fxn(count_spaces, rows)).values
+    _df["frac_other"] = df.apply(lambda rows: frac_fxn(count_other_text, rows)).values
 
     # line length metrics
-    _df['mean_line_length'] = df.apply(lambda rows: np.mean([len(str(s)) for s in rows])).values
-    _df['median_line_length'] = df.apply(lambda rows: np.median([len(str(s)) for s in rows])).values
-    _df['std_line_length'] = df.apply(lambda rows: np.std([len(str(s)) for s in rows])).values
+    _df["mean_line_length"] = df.apply(lambda rows: avg_len(np.mean, rows)).values
+    _df["median_line_length"] = df.apply(lambda rows: avg_len(np.median, rows)).values
+    _df["std_line_length"] = df.apply(lambda rows: avg_len(np.std, rows)).values
 
     # unique char / token metrics
-    _df['unq_char_count'] = df.apply(lambda rows: len(set([i for s in rows for i in str(s)]))).values
-    _df['unq_token_count'] = df.apply(lambda rows: len(set([str(s) for s in rows]))).values
+    _df["unq_char_count"] = df.apply(unq_char_count).values
+    _df["unq_token_count"] = df.apply(unq_token_count).values
 
     # number of rows tagged on each column
-    _df['row_count'] = df.apply(lambda rows: len(rows)).values
+    _df["row_count"] = df.apply(lambda rows: len(rows)).values
 
     return _df.transpose()
 

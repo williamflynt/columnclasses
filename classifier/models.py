@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from django.db import models
 
 from columnclasses.models import TimeStampedModel
@@ -64,6 +66,16 @@ class Column(TimeStampedModel):
     # Descriptive stats as a JSON object (sqlite doesn't have JSONField)
     # analysis = JSONField(blank=True)
     analysis = models.TextField(blank=True)
+
+    @staticmethod
+    def get_lbl(c: Classification) -> str:
+        if c is not None:
+            return c.label
+        return ""
+
+    @property
+    def labels(self) -> Tuple[str, str]:
+        return self.get_lbl(self.main_class), self.get_lbl(self.sub_class)
 
     def __str__(self) -> str:
         return f"{self.source.document.name[:10]} - Column {self.index}"

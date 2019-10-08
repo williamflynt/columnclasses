@@ -24,7 +24,9 @@ def mean_token_count(rows: pd.Series, sep: str = None) -> float:
 def mean_token_length(rows: pd.Series, sep: str = None) -> float:
     """get the mean token length for each cell in a column"""
     tokenized = [tokenize(s) for s in rows]
-    tokens = list(itertools.chain.from_iterable([tokenized]))
+    tokens = list(itertools.chain.from_iterable(tokenized))
+    if not tokens:
+        return -1
     result = np.mean([len(t) for t in tokens])
     return result
 
@@ -52,7 +54,7 @@ def unq_char_count(rows: pd.Series) -> int:
 
 def unq_token_count(rows: pd.Series, sep=None) -> int:
     """count the number of unique tokens across an entire column"""
-    aggregated = " ".join([str(r) for r in rows])
+    aggregated = f"{sep or ' '}".join([str(r) for r in rows])
     tokens = tokenize(aggregated)
     return len(set(tokens))
 
@@ -95,3 +97,17 @@ def frac_fxn(fxn, rows) -> float:
     except ZeroDivisionError:
         return -1
     return result
+
+
+def frac_token(rows: pd.Series, asset: set, sep: str = None, left: int = None) -> float:
+    """get the fraction of tokens that match a set of canonical tokens"""
+    aggregated = f"{sep or ' '}".join([str(r) for r in rows])
+    tokens = tokenize(aggregated)
+    if not tokens:  # guard against empty column
+        return -1
+    match = 0
+    for t in tokens:
+        x = t[:left] if left else t
+        if x.lower() in asset:
+            match += 1
+    return match / len(tokens)

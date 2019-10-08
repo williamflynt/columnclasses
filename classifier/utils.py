@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from django.core.files import File
 
+from classifier.assets import AssetHolder
 from classifier.models import Source
 from classifier.pd_operations import (
     mean_token_count,
@@ -17,7 +18,10 @@ from classifier.pd_operations import (
     count_spaces,
     count_other_text,
     frac_fxn,
+    frac_token,
 )
+
+assets = AssetHolder()
 
 
 def load_csv(document: File) -> pd.DataFrame:
@@ -68,6 +72,21 @@ def analyze_dataframe(df: pd.DataFrame, labels: Dict[str, List[str]]) -> pd.Data
     # unique char / token metrics
     _df["unq_char_count"] = df.apply(unq_char_count).values
     _df["unq_token_count"] = df.apply(unq_token_count).values
+
+    # list-matching metrics
+    _df["frac_given"] = df.apply(lambda rows: frac_token(rows, assets.given)).values
+    _df["frac_surnames"] = df.apply(
+        lambda rows: frac_token(rows, assets.surnames)
+    ).values
+    _df["frac_states"] = df.apply(lambda rows: frac_token(rows, assets.states)).values
+    _df["frac_cities"] = df.apply(lambda rows: frac_token(rows, assets.cities)).values
+    _df["frac_counties"] = df.apply(
+        lambda rows: frac_token(rows, assets.counties)
+    ).values
+    _df["frac_zipcodes"] = df.apply(
+        lambda rows: frac_token(rows, assets.zipcodes, left=5)
+    ).values
+    _df["frac_fips"] = df.apply(lambda rows: frac_token(rows, assets.fips)).values
 
     # number of rows tagged on each column
     _df["row_count"] = df.apply(lambda rows: len(rows)).values

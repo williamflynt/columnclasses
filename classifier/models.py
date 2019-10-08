@@ -1,3 +1,5 @@
+from typing import Tuple
+
 from django.db import models
 
 from columnclasses.models import TimeStampedModel
@@ -20,7 +22,7 @@ class Classification(TimeStampedModel):
     """A type that a Column can be"""
 
     # what we are labeling the column - a target for a classifier
-    label = models.CharField(max_length=255, blank=True, unique=True)
+    label = models.CharField(max_length=255)
 
     # human words on what this is
     description = models.TextField(blank=True)
@@ -39,7 +41,7 @@ class Classification(TimeStampedModel):
 
 
 class Column(TimeStampedModel):
-    """a column in a Source CSV"""
+    """a column in a CSV"""
 
     # The CSV-storing model
     source = models.ForeignKey("Source", on_delete=models.CASCADE)
@@ -65,8 +67,15 @@ class Column(TimeStampedModel):
     # analysis = JSONField(blank=True)
     analysis = models.TextField(blank=True)
 
-    class Meta:
-        unique_together = ("source", "index")
+    @staticmethod
+    def get_lbl(c: Classification) -> str:
+        if c is not None:
+            return c.label
+        return ""
+
+    @property
+    def labels(self) -> Tuple[str, str]:
+        return self.get_lbl(self.main_class), self.get_lbl(self.sub_class)
 
     def __str__(self) -> str:
         return f"{self.source.document.name[:10]} - Column {self.index}"

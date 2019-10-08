@@ -7,40 +7,36 @@ def add_defaults(apps, schema_editor):
     """add some default classifications"""
     Classification = apps.get_model("classifier", "Classification")
 
-    fulladdr = Classification.objects.create(label="fulladdr", description="A full address in one cell")
-    street = Classification.objects.create(label="street", description="A street address")
-    city = Classification.objects.create(label="city", description="A city name")
-    state = Classification.objects.create(label="state", description="A state or province name")
-    zipcode = Classification.objects.create(label="zipcode", description="A zipcode (US, Canadian or otherwise)")
-    housenumber = Classification.objects.create(label="housenumber", description="A zipcode (US, Canadian or otherwise)")
-    streetdir = Classification.objects.create(label="streetdir", description="A zipcode (US, Canadian or otherwise)")
-    streetname = Classification.objects.create(label="streetname", description="A zipcode (US, Canadian or otherwise)")
-    unit = Classification.objects.create(label="unit", description="A zipcode (US, Canadian or otherwise)")
+    predir = Classification.objects.create(label="pre", description="A zipcode (US, Canadian or otherwise)")
+    postdir = Classification.objects.create(label="post", description="A zipcode (US, Canadian or otherwise)")
+    direction = Classification.objects.create(label="direction", description="A zipcode (US, Canadian or otherwise)", main=True)
+    direction.subclasses.add(predir)
+    direction.subclasses.add(postdir)
 
-    mailing = Classification.objects.create(label="mailing", description="Relates to the mailing address", main=True)
-    situs = Classification.objects.create(label="situs", description="Relates to the situs/property address", main=True)
-    for item in [mailing, situs]:
-        item.subclasses.add(fulladdr)
-        item.subclasses.add(street)
-        item.subclasses.add(city)
-        item.subclasses.add(state)
-        item.subclasses.add(zipcode)
-        item.subclasses.add(housenumber)
-        item.subclasses.add(streetdir)
-        item.subclasses.add(streetname)
-        item.subclasses.add(unit)
+    mailing = Classification.objects.create(label="mailing", description="Relates to the mailing address")
+    situs = Classification.objects.create(label="situs", description="Relates to the situs/property address")
 
-    fullname = Classification.objects.create(label="fullname", description="A single person's full name in one cell")
+    fulladdr = Classification.objects.create(label="fulladdr", description="A full address in one cell", main=True)
+    street = Classification.objects.create(label="street", description="A street address", main=True)
+    city = Classification.objects.create(label="city", description="A city name", main=True)
+    state = Classification.objects.create(label="state", description="A state or province name", main=True)
+    zipcode = Classification.objects.create(label="zipcode", description="A zipcode (US, Canadian or otherwise)", main=True)
+    housenumber = Classification.objects.create(label="housenumber", description="A zipcode (US, Canadian or otherwise)", main=True)
+    streetname = Classification.objects.create(label="streetname", description="A zipcode (US, Canadian or otherwise)", main=True)
+    unit = Classification.objects.create(label="unit", description="A zipcode (US, Canadian or otherwise)", main=True)
+
+    for item in [fulladdr, street, city, state, zipcode, housenumber, streetname, unit]:
+        item.subclasses.add(mailing)
+        item.subclasses.add(situs)
+
+    fullname = Classification.objects.create(label="fullname", description="One or many person names in one cell", main=True)
+    partname = Classification.objects.create(label="partname", description="A name component or incomplete name.", main=True)
     first = Classification.objects.create(label="first", description="A first name")
     middle = Classification.objects.create(label="middle", description="A middle name or initial")
     last = Classification.objects.create(label="last", description="A surname")
-    multiname = Classification.objects.create(label="multiname", description="More than one person's name in one cell")
-    name = Classification.objects.create(label="name", description="Relates to the owning entity name", main=True)
-    name.subclasses.add(fullname)
-    name.subclasses.add(first)
-    name.subclasses.add(middle)
-    name.subclasses.add(last)
-    name.subclasses.add(multiname)
+    partname.subclasses.add(first)
+    partname.subclasses.add(middle)
+    partname.subclasses.add(last)
 
     phone = Classification.objects.create(label="phone", description="A phone number", main=True)
 
@@ -54,7 +50,7 @@ def add_defaults(apps, schema_editor):
 
     apn = Classification.objects.create(label="apn", description="A parcel number", main=True)
 
-    dontcare = Classification.objects.create(label="", description="A value we don't care about", main=True)
+    reject = Classification.objects.create(label="", description="A value we don't care about", main=True)
 
 
 class Migration(migrations.Migration):

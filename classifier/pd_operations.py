@@ -1,9 +1,18 @@
 """Small functions to clean up readability of the dataframe processing"""
 import itertools
+import re
 from typing import Callable, List
 
 import numpy as np
 import pandas as pd
+
+
+def aggregate_rows(rows: pd.Series, sep: str = None) -> str:
+    """aggregate all row contents as a string"""
+    if sep is None:
+        sep = " "
+    aggregated = f"{sep}".join([str(r) for r in rows])
+    return aggregated
 
 
 def tokenize(s: str, sep: str = None) -> List[str]:
@@ -54,7 +63,7 @@ def unq_char_count(rows: pd.Series) -> int:
 
 def unq_token_count(rows: pd.Series, sep=None) -> int:
     """count the number of unique tokens across an entire column"""
-    aggregated = f"{sep or ' '}".join([str(r) for r in rows])
+    aggregated = aggregate_rows(rows, sep)
     tokens = tokenize(aggregated)
     return len(set(tokens))
 
@@ -79,7 +88,7 @@ def count_other_text(s):
     return len(s) - count_digits(s) - count_letters(s) - count_spaces(s)
 
 
-def frac_fxn(fxn, rows) -> float:
+def frac_fxn(fxn, rows, sep: str = "") -> float:
     """
     calculates the numerator and denominator for functions requiring fractions
 
@@ -90,7 +99,7 @@ def frac_fxn(fxn, rows) -> float:
 
     Note: An empty column will produce a ZeroDivisionError - so let's just return -1
     """
-    aggregated = "".join([str(r) for r in rows])
+    aggregated = aggregate_rows(rows, sep)
     fxn_result = fxn(aggregated)
     try:
         result = fxn_result / len(aggregated)
@@ -101,7 +110,7 @@ def frac_fxn(fxn, rows) -> float:
 
 def frac_token(rows: pd.Series, asset: set, sep: str = None, left: int = None) -> float:
     """get the fraction of tokens that match a set of canonical tokens"""
-    aggregated = f"{sep or ' '}".join([str(r) for r in rows])
+    aggregated = aggregate_rows(rows, sep)
     tokens = tokenize(aggregated)
     if not tokens:  # guard against empty column
         return -1
@@ -111,3 +120,14 @@ def frac_token(rows: pd.Series, asset: set, sep: str = None, left: int = None) -
         if x.lower() in asset:
             match += 1
     return match / len(tokens)
+
+
+def frac_regex(
+    rows: pd.Series, raw_string: str, sep: str = None, search: bool = False
+) -> float:
+    """get the fraction of tokens that match a regular expression"""
+    pattern = re.compile(raw_string, re.IGNORECASE)
+    aggregated = aggregate_rows(rows, sep)
+    tokens = tokenize(aggregated, sep)
+    re_fxn = pattern.match if not search else pattern.search
+    return sum([int(bool(re_fxn(t))) for t in tokens])/len(tokens)

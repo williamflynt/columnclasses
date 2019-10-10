@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block main-title %}Classify{% endblock main-title %}
+{% block main-title %}Classify - {{ source.document.name }}{% endblock main-title %}
 
 {% block extracss %}
     <style>
@@ -16,10 +16,10 @@
 
 {% block extrasidebar %}
     <button class="btn btn-primary" onClick="sendFormData({{ headers|length }})">Classify CSV</button>
+    <p class="text-muted" style="font-size: 0.8em;">Progress: {{ completion }}</p>
 {% endblock extrasidebar %}
 
 {% block content %}
-    <h2>{{ source.document.name }}</h2>
     <div class="table-responsive">
         <table class="table table-striped table-sm" style="font-size: 0.7em;">
             <thead>

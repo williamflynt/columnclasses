@@ -5,6 +5,7 @@ class AssetHolder:
         self.given = self._load_as_set("assets/lists/given-names")
         self.surnames = self._load_as_set("assets/lists/surnames")
         self.states = self._load_as_set("assets/lists/states")
+        self.canada = self._load_as_set("assets/lists/canada")
         self.cities = self._load_as_set("assets/lists/cities")
         self.counties = self._load_as_set("assets/lists/counties")
         self.zipcodes = self._load_as_set("assets/lists/zipcodes")

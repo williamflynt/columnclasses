@@ -24,6 +24,7 @@ def add_defaults(apps, schema_editor):
     housenumber = Classification.objects.create(label="housenumber", description="A zipcode (US, Canadian or otherwise)", main=True)
     streetname = Classification.objects.create(label="streetname", description="A zipcode (US, Canadian or otherwise)", main=True)
     unit = Classification.objects.create(label="unit", description="A zipcode (US, Canadian or otherwise)", main=True)
+    # TODO: part street name, street type, unit num, unit type
 
     for item in [fulladdr, street, city, state, zipcode, housenumber, streetname, unit]:
         item.subclasses.add(mailing)

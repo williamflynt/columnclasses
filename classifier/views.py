@@ -36,9 +36,10 @@ class ClassifyView(TemplateView):
             reader = csv.reader(f, delimiter=",")
             lines = list(reader)
             context["headers"] = lines.pop(0)
-            context["rows"] = lines[:5]
+            context["rows"] = lines[:9]
         mains = Classification.objects.filter(main=True).values_list("id", "label")
         context["mains"] = mains
+        context["completion"] = f"{Source.objects.filter(time_classified__isnull=False).count()} / {Source.objects.count()}"
         return context
 
     def get(self, request, *args, **kwargs):

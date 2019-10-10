@@ -28,7 +28,7 @@ assets = AssetHolder()
 def load_csv(document: File) -> pd.DataFrame:
     """load a CSV from a Source.document field to a dataframe"""
     with document.open("r") as f:
-        df = pd.read_csv(f, keep_default_na=False)
+        df = pd.read_csv(f, keep_default_na=False, dtype=object)
     return df
 
 

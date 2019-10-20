@@ -54,7 +54,10 @@ def unq_char_count(rows: pd.Series) -> int:
 
 def unq_token_count(rows: pd.Series, sep=None) -> int:
     """count the number of unique tokens across an entire column"""
-    aggregated = f"{sep or ' '}".join([str(r) for r in rows])
+    aggregated = ' '.join([str(r) for r in rows])
+      
+        # in python 3.5, f strings don't work
+    # aggregated = f"{sep or ' '}".join([str(r) for r in rows])
     tokens = tokenize(aggregated)
     return len(set(tokens))
 
